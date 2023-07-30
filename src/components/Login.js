@@ -76,7 +76,7 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              style={{ backgroundColor: '#007BFF', color: 'white', padding: '10px 20px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
+              style={{ backgroundColor: '#008631', color: 'white', padding: '10px 20px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
             >
               Register
             </button>
@@ -118,7 +118,7 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              style={{ backgroundColor: '#007BFF', color: 'white', padding: '10px 20px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
+              style={{ backgroundColor: '#008631', color: 'white', padding: '10px 20px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}
             >
               Login
             </button>
