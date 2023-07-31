@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { MdModeEditOutline } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 import { FaPlus } from "react-icons/fa";
 import { RiDeleteBin6Fill } from "react-icons/ri";
+import Cookies from 'js-cookie';
 
 const categoryOptions = [
   "Health",
@@ -198,6 +200,8 @@ function App() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isExpenseFound, setIsExpenseFound] = useState(true);
+  const loggedInUser = JSON.parse(Cookies.get('loggedInUser'));
+  const navigate = useNavigate();
 
   const editTransaction = (editedTransaction) => {
     const updatedTransactions = transactions.map((t) =>
@@ -256,6 +260,7 @@ function App() {
   };
 
   return (
+    
     <div className="bg-gray-300 min-h-screen">
       <h1 className="text-3xl font-bold text-center pt-10">
         Personal Finance Tracker
@@ -369,7 +374,21 @@ function App() {
               </tbody>
             </table>
           </div>
-
+          <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4">Welcome, {loggedInUser.email}</h2>
+      <p className="text-lg text-gray-700 mb-6">You logged in on: {new Date(loggedInUser.loginDate).toLocaleString()}</p>
+      <button
+        onClick={() => {
+          // Handle logout functionality here
+          // For example, you can clear the user session and navigate to the login page
+          // replace 'login' with your actual login page path
+          navigate('/');
+        }}
+        className="block w-full px-4 py-2 text-center text-white bg-indigo-500 rounded-lg hover:bg-indigo-600"
+      >
+        Logout
+      </button>
+    </div>
           {showAddDialog && (
             <div className="fixed inset-0 bg-gray-700 bg-opacity-75 flex items-center justify-center">
               <div className="bg-white p-5 rounded shadow-lg border border-gray-100">

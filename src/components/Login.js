@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,6 +36,8 @@ const Login = () => {
     // Check if the user is registered
     const user = registeredUsers.find((user) => user.email === email && user.password === password);
     if (user) {
+      // Store login details in cookie
+      Cookies.set('loggedInUser', JSON.stringify({ email: user.email, loginDate: new Date().toISOString() }));
       // Redirect to ViewExpensePage after successful login
       navigate('/App');
     } else {
