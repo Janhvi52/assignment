@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MdModeEditOutline } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from "react-icons/fa";
@@ -13,6 +13,11 @@ const categoryOptions = [
   "Books",
   "Others",
 ];
+
+const setTransactionsInCookies = (transactions) => {
+  Cookies.set('transactions', JSON.stringify(transactions));
+};
+
 
 function AddTransaction({
   description,
@@ -203,6 +208,18 @@ function App() {
   const loggedInUser = JSON.parse(Cookies.get('loggedInUser'));
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const savedTransactions = Cookies.get('transactions');
+    if (savedTransactions) {
+      setTransaction(JSON.parse(savedTransactions));
+    }
+  }, []);
+
+  // Save transactions to cookies whenever transactions state changes
+  useEffect(() => {
+    setTransactionsInCookies(transactions);
+  }, [transactions]);
+
   const editTransaction = (editedTransaction) => {
     const updatedTransactions = transactions.map((t) =>
       t.id === editId ? editedTransaction : t
@@ -384,7 +401,7 @@ function App() {
           // replace 'login' with your actual login page path
           navigate('/');
         }}
-        className="block w-full px-4 py-2 text-center text-white bg-indigo-500 rounded-lg hover:bg-indigo-600"
+        className="block w-full px-4 py-2 text-center text-white bg-green-500 rounded-lg hover:bg-green-600"
       >
         Logout
       </button>
