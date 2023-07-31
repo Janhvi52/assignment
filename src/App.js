@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { MdModeEditOutline } from "react-icons/md";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
 const categoryOptions = [
   "Health",
@@ -15,7 +15,7 @@ const categoryOptions = [
 ];
 
 const setTransactionsInCookies = (transactions) => {
-  Cookies.set('transactions', JSON.stringify(transactions));
+  Cookies.set("transactions", JSON.stringify(transactions));
 };
 
 function getCurrentTimestamp() {
@@ -208,11 +208,11 @@ function App() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isExpenseFound, setIsExpenseFound] = useState(true);
-  const loggedInUser = JSON.parse(Cookies.get('loggedInUser'));
+  const loggedInUser = JSON.parse(Cookies.get("loggedInUser"));
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedTransactions = Cookies.get('transactions');
+    const savedTransactions = Cookies.get("transactions");
     if (savedTransactions) {
       setTransaction(JSON.parse(savedTransactions));
     }
@@ -225,7 +225,14 @@ function App() {
 
   const editTransaction = (editedTransaction) => {
     const updatedTransactions = transactions.map((t) =>
-      t.id === editId ? { ...editedTransaction, updatedAt: getCurrentTimestamp() } : t
+      t.id === editId
+        ? {
+            ...editedTransaction,
+            createdBy: t.createdBy, 
+            editedBy: loggedInUser.email, // Add the email of the user who edited the transaction
+            updatedAt: getCurrentTimestamp(),
+          }
+        : t
     );
     setTransaction(updatedTransactions);
     setEditId(null);
@@ -235,7 +242,9 @@ function App() {
     e.preventDefault();
     if (editId) {
       const newTransaction = transactions.map((t) =>
-        t.id === editId ? { ...t, description, amount, updatedAt: getCurrentTimestamp() } : t
+        t.id === editId
+          ? { ...t, description, amount, updatedAt: getCurrentTimestamp() }
+          : t
       );
       setTransaction(newTransaction);
       setEditId(null);
@@ -247,6 +256,7 @@ function App() {
         dateOfExpense,
         amount,
         createdBy: loggedInUser.email,
+        editedBy: "",
         updatedAt: getCurrentTimestamp(),
       };
       setTransaction([...transactions, newTransaction]);
@@ -286,7 +296,6 @@ function App() {
   };
 
   return (
-    
     <div className="bg-gray-300 min-h-screen">
       <h1 className="text-3xl font-bold text-center pt-10">
         Personal Finance Tracker
@@ -362,11 +371,11 @@ function App() {
                     Amount
                   </th>
                   <th className="w-1/4 px-2 py-2 border border-gray-500">
-                Created by
-              </th>
-              <th className="w-1/4 px-2 py-2 border border-gray-500">
-                Updated at
-              </th>
+                    Created by
+                  </th>
+                  <th className="w-1/4 px-2 py-2 border border-gray-500">
+                    Updated at
+                  </th>
                   <th className="w-1/4 px-2 py-2 border border-gray-500"></th>
                 </tr>
               </thead>
@@ -386,11 +395,17 @@ function App() {
                       INR {t.amount}
                     </td>
                     <td className="py-2 px-2 md:px-4 border border-gray-300">
-                  {t.createdBy === loggedInUser.email ? "me" : t.createdBy}
-                </td>
-                <td className="py-2 px-2 md:px-4 border border-gray-300">
-                  {new Date(t.updatedAt).toLocaleString()}
-                </td>
+                      {loggedInUser && loggedInUser.email === t.createdBy
+                        ? loggedInUser.email
+                        : t.createdBy}
+                       
+                    </td>
+
+                    <td className="py-2 px-2 md:px-4 border border-gray-300">
+                      {t.editedBy ? `Edited by: ${t.editedBy}` : ""}
+                      {t.editedBy && <br />}
+                      {new Date(t.updatedAt).toLocaleString()}
+                    </td>
                     <td className="py-2 px-2 md:px-4 border border-gray-300">
                       <div className="flex flex-col md:flex-row md:items-center">
                         <button
@@ -413,20 +428,25 @@ function App() {
             </table>
           </div>
           <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Welcome, {loggedInUser.email}</h2>
-      <p className="text-lg text-gray-700 mb-6">You logged in on: {new Date(loggedInUser.loginDate).toLocaleString()}</p>
-      <button
-        onClick={() => {
-          // Handle logout functionality here
-          // For example, you can clear the user session and navigate to the login page
-          // replace 'login' with your actual login page path
-          navigate('/');
-        }}
-        className="block w-full px-4 py-2 text-center text-white bg-green-500 rounded-lg hover:bg-green-600"
-      >
-        Logout
-      </button>
-    </div>
+            <h2 className="text-2xl font-bold mb-4">
+              Welcome, {loggedInUser.email}
+            </h2>
+            <p className="text-lg text-gray-700 mb-6">
+              You logged in on:{" "}
+              {new Date(loggedInUser.loginDate).toLocaleString()}
+            </p>
+            <button
+              onClick={() => {
+                // Handle logout functionality here
+                // For example, you can clear the user session and navigate to the login page
+                // replace 'login' with your actual login page path
+                navigate("/");
+              }}
+              className="block w-full px-4 py-2 text-center text-white bg-green-500 rounded-lg hover:bg-green-600"
+            >
+              Logout
+            </button>
+          </div>
           {showAddDialog && (
             <div className="fixed inset-0 bg-gray-700 bg-opacity-75 flex items-center justify-center">
               <div className="bg-white p-5 rounded shadow-lg border border-gray-100">
