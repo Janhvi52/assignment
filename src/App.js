@@ -18,6 +18,9 @@ const setTransactionsInCookies = (transactions) => {
   Cookies.set('transactions', JSON.stringify(transactions));
 };
 
+function getCurrentTimestamp() {
+  return new Date().toISOString();
+}
 
 function AddTransaction({
   description,
@@ -222,7 +225,7 @@ function App() {
 
   const editTransaction = (editedTransaction) => {
     const updatedTransactions = transactions.map((t) =>
-      t.id === editId ? editedTransaction : t
+      t.id === editId ? { ...editedTransaction, updatedAt: getCurrentTimestamp() } : t
     );
     setTransaction(updatedTransactions);
     setEditId(null);
@@ -232,15 +235,21 @@ function App() {
     e.preventDefault();
     if (editId) {
       const newTransaction = transactions.map((t) =>
-        t.id === editId ? { id: editId, description, amount } : t
+        t.id === editId ? { ...t, description, amount, updatedAt: getCurrentTimestamp() } : t
       );
       setTransaction(newTransaction);
       setEditId(null);
     } else {
-      setTransaction([
-        ...transactions,
-        { id: Date.now(), description, category, dateOfExpense, amount },
-      ]);
+      const newTransaction = {
+        id: Date.now(),
+        description,
+        category,
+        dateOfExpense,
+        amount,
+        createdBy: loggedInUser.email,
+        updatedAt: getCurrentTimestamp(),
+      };
+      setTransaction([...transactions, newTransaction]);
     }
     setDescription("");
     setAmount(0);
@@ -352,6 +361,12 @@ function App() {
                   <th className="w-1/4 px-2 py-2 border border-gray-500">
                     Amount
                   </th>
+                  <th className="w-1/4 px-2 py-2 border border-gray-500">
+                Created by
+              </th>
+              <th className="w-1/4 px-2 py-2 border border-gray-500">
+                Updated at
+              </th>
                   <th className="w-1/4 px-2 py-2 border border-gray-500"></th>
                 </tr>
               </thead>
@@ -370,6 +385,12 @@ function App() {
                     <td className="py-2 px-2 md:px-4 border border-gray-300">
                       INR {t.amount}
                     </td>
+                    <td className="py-2 px-2 md:px-4 border border-gray-300">
+                  {t.createdBy === loggedInUser.email ? "me" : t.createdBy}
+                </td>
+                <td className="py-2 px-2 md:px-4 border border-gray-300">
+                  {new Date(t.updatedAt).toLocaleString()}
+                </td>
                     <td className="py-2 px-2 md:px-4 border border-gray-300">
                       <div className="flex flex-col md:flex-row md:items-center">
                         <button
